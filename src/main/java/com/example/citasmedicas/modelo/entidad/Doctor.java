@@ -38,6 +38,9 @@ public class Doctor extends BaseEntidad {
     @Column(name = "apellido", nullable = false, length = 100)
     private String apellido; // Apellido del doctor
 
+    @Column(name = "email", nullable = false, unique = true, length = 150)
+    private String email; // Correo electrónico del doctor, usado para login
+
     @Column(name = "url_foto_perfil", length = 255)
     private String urlFotoPerfil; // URL de la foto de perfil
 
