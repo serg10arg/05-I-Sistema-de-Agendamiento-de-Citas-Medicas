@@ -8,7 +8,8 @@ import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Enumerated;
 import jakarta.persistence.EnumType;
-import lombok.*;
+import lombok.*; // Keep existing
+import lombok.experimental.SuperBuilder; // Add this
 
 /**
  * Entidad que representa una cita agendada entre un doctor y un paciente.
@@ -19,7 +20,7 @@ import lombok.*;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {})
 @ToString(callSuper = true)
 public class Cita extends BaseEntidad {
@@ -42,19 +43,4 @@ public class Cita extends BaseEntidad {
     @Enumerated(EnumType.STRING) // Almacena el enum como String en la BD
     @Column(name = "estado", nullable = false, length = 50)
     private EstadoCita estado = EstadoCita.CONFIRMADA; // Estado actual de la cita (por defecto CONFIRMADA)
-
-    /**
-     * Constructor para crear una nueva cita.
-     * @param doctor El doctor involucrado en la cita.
-     * @param paciente El paciente que agenda la cita.
-     * @param disponibilidad El bloque de tiempo de disponibilidad reservado.
-     * @param razonVisita La razón por la que el paciente agenda la cita.
-     */
-    public Cita(Doctor doctor, Paciente paciente, Disponibilidad disponibilidad, String razonVisita) {
-        this.doctor = doctor;
-        this.paciente = paciente;
-        this.disponibilidad = disponibilidad;
-        this.razonVisita = razonVisita;
-        this.estado = EstadoCita.CONFIRMADA;
-    }
 }

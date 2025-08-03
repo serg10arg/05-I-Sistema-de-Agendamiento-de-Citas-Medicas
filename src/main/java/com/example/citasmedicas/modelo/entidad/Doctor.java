@@ -8,11 +8,11 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.ManyToOne;
 import jakarta.persistence.OneToMany;
 import jakarta.persistence.Table;
+import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
@@ -27,7 +27,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {})
 @ToString(callSuper = true)
 public class Doctor extends BaseEntidad {
@@ -40,6 +40,10 @@ public class Doctor extends BaseEntidad {
 
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email; // Correo electrónico del doctor, usado para login
+
+    @ToString.Exclude // Nunca incluir la contraseña en logs
+    @Column(name = "contrasena", nullable = false)
+    private String contrasena; // Contraseña codificada del doctor
 
     @Column(name = "url_foto_perfil", length = 255)
     private String urlFotoPerfil; // URL de la foto de perfil

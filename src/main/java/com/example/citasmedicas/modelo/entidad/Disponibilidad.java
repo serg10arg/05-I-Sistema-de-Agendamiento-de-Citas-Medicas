@@ -1,6 +1,7 @@
 package com.example.citasmedicas.modelo.entidad;
 
 import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
 import lombok.*;
 
 import java.time.LocalDateTime; // Usar LocalDateTime para fecha y hora
@@ -14,7 +15,7 @@ import java.time.LocalDateTime; // Usar LocalDateTime para fecha y hora
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {})
 @ToString(callSuper = true)
 public class Disponibilidad extends BaseEntidad {
@@ -32,10 +33,4 @@ public class Disponibilidad extends BaseEntidad {
     @Column(name = "esta_reservado", nullable = false)
     private Boolean estaReservado = false; // Indica si el bloque ya está reservado por una cita
 
-    // Este constructor es solo para facilidad en las pruebas y no se usa en la lógica de negocio principal
-    public Disponibilidad(Doctor doctor, LocalDateTime horaInicio, LocalDateTime horaFin) {
-        this.doctor = doctor;
-        this.horaInicio = horaInicio;
-        this.horaFin = horaFin;
-    }
 }

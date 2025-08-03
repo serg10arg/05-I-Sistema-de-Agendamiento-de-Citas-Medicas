@@ -1,5 +1,9 @@
 package com.example.citasmedicas.seguridad;
 
+import com.example.citasmedicas.modelo.entidad.Doctor;
+import com.example.citasmedicas.modelo.entidad.Paciente;
+import com.example.citasmedicas.repositorio.DoctorRepositorio;
+import com.example.citasmedicas.repositorio.PacienteRepositorio;
 import com.example.citasmedicas.seguridad.enumeracion.RolUsuario;
 import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -9,42 +13,20 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
-import java.util.List;
-import java.util.ArrayList; // No en fuentes, pero necesario para List
 
 /**
  * Implementación personalizada de UserDetailsService.
- * Para este ejemplo, simula usuarios en memoria.
- * En un sistema real, se cargarían usuarios de una base de datos.
+ * Carga los detalles del usuario desde la base de datos.
  */
 @Service
 public class UsuarioDetailsServicePersonalizado implements UserDetailsService {
 
-    private final PasswordEncoder passwordEncoder;
+    private final PacienteRepositorio pacienteRepositorio;
+    private final DoctorRepositorio doctorRepositorio;
 
-    // Simulación de usuarios en memoria. En un sistema real, se usaría un repositorio.
-    private final List<UserDetails> usuarios;
-
-    public UsuarioDetailsServicePersonalizado(PasswordEncoder passwordEncoder) {
-        this.passwordEncoder = passwordEncoder;
-        // Inicializar la lista aquí, cuando passwordEncoder ya no es nulo.
-        this.usuarios = new ArrayList<>(Arrays.asList(
-                User.builder()
-                        .username("paciente1@example.com")
-                        .password(this.passwordEncoder.encode("password")) // Contraseña codificada
-                        .roles(RolUsuario.PATIENT.name()) // Rol PATIENT
-                        .build(),
-                User.builder()
-                        .username("doctor1@example.com")
-                        .password(this.passwordEncoder.encode("password"))
-                        .roles(RolUsuario.DOCTOR.name()) // Rol DOCTOR
-                        .build(),
-                User.builder()
-                        .username("admin@example.com")
-                        .password(this.passwordEncoder.encode("password"))
-                        .roles(RolUsuario.ADMIN.name()) // Rol ADMIN
-                        .build()
-        ));
+    public UsuarioDetailsServicePersonalizado(PacienteRepositorio pacienteRepositorio, DoctorRepositorio doctorRepositorio) {
+        this.pacienteRepositorio = pacienteRepositorio;
+        this.doctorRepositorio = doctorRepositorio;
     }
 
     /**
@@ -55,9 +37,25 @@ public class UsuarioDetailsServicePersonalizado implements UserDetailsService {
      */
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        return usuarios.stream()
-                .filter(user -> user.getUsername().equals(username))
-                .findFirst()
-                .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado: " + username));
+        // Buscar primero en el repositorio de pacientes
+        return pacienteRepositorio.findByEmail(username)
+                .map(this::crearUserDetailsDesdePaciente)
+                .orElseGet(() -> doctorRepositorio.findByEmail(username) // Si no se encuentra, buscar en doctores
+                        .map(this::crearUserDetailsDesdeDoctor)
+                        .orElseThrow(() -> new UsernameNotFoundException("Usuario no encontrado con email: " + username)));
+    }
+
+    private UserDetails crearUserDetailsDesdePaciente(Paciente paciente) {
+        return User.withUsername(paciente.getEmail())
+                .password(paciente.getContrasena())
+                .roles(RolUsuario.PATIENT.name())
+                .build();
+    }
+
+    private UserDetails crearUserDetailsDesdeDoctor(Doctor doctor) {
+        return User.withUsername(doctor.getEmail())
+                .password(doctor.getContrasena())
+                .roles(RolUsuario.DOCTOR.name()) // Asumimos que todos los doctores tienen este rol
+                .build();
     }
 }

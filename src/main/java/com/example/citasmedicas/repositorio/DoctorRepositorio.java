@@ -10,6 +10,7 @@ import org.springframework.data.jpa.repository.Query;
 import org.springframework.stereotype.Repository;
 
 import java.util.List;
+import java.util.Optional;
 import java.util.UUID;
 
 /**
@@ -33,4 +34,7 @@ public interface DoctorRepositorio extends JpaRepository<Doctor, UUID> {
 
     // Permite encontrar doctores por primer nombre o apellido, ignorando mayúsculas/minúsculas
     Page<Doctor> findByPrimerNombreContainingIgnoreCaseOrApellidoContainingIgnoreCase(String primerNombre, String apellido, Pageable pageable);
+
+    // Permite encontrar un doctor por su correo electrónico para la autenticación
+    Optional<Doctor> findByEmail(String email);
 }

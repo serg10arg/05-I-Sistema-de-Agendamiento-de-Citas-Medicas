@@ -1,5 +1,6 @@
 package com.example.citasmedicas.seguridad.servicio;
 
+import com.example.citasmedicas.seguridad.config.JwtPropiedades;
 import io.jsonwebtoken.Claims;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -21,13 +22,11 @@ import java.util.function.Function;
 @Service
 public class JwtServicio {
 
-    // Se carga la clave secreta desde application.properties
-    @Value("${jwt.secret}")
-    private String CLAVE_SECRETA;
+    private final JwtPropiedades jwtPropiedades;
 
-    // Se carga el tiempo de expiración desde application.properties
-    @Value("${jwt.expiration}")
-    private long TIEMPO_EXPIRACION;
+    public JwtServicio(JwtPropiedades jwtPropiedades) {
+        this.jwtPropiedades = jwtPropiedades;
+    }
 
     /**
      * Genera un token JWT para un nombre de usuario dado.
@@ -50,7 +49,7 @@ public class JwtServicio {
                 .setClaims(claims) // Establece los claims
                 .setSubject(subject) // Establece el sujeto
                 .setIssuedAt(new Date(System.currentTimeMillis())) // Fecha de emisión
-                .setExpiration(new Date(System.currentTimeMillis() + TIEMPO_EXPIRACION)) // Fecha de expiración
+                .setExpiration(new Date(System.currentTimeMillis() + jwtPropiedades.getExpiration())) // Fecha de expiración
                 .signWith(getSigningKey()) // Firma el token con la clave secreta. El algoritmo se infiere de la clave (HS256).
                 .compact(); // Construye el token
     }
@@ -60,7 +59,7 @@ public class JwtServicio {
      * @return La clave de firma.
      */
     private Key getSigningKey() {
-        byte[] keyBytes = Decoders.BASE64.decode(CLAVE_SECRETA); // Decodifica la clave base64
+        byte[] keyBytes = Decoders.BASE64.decode(jwtPropiedades.getSecret()); // Decodifica la clave base64
         return Keys.hmacShaKeyFor(keyBytes); // Crea una clave HMAC para la firma
     }
 

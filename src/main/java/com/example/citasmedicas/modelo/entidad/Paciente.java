@@ -1,11 +1,11 @@
 package com.example.citasmedicas.modelo.entidad;
 
 import jakarta.persistence.*;
+import lombok.experimental.SuperBuilder;
 import lombok.EqualsAndHashCode;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.NoArgsConstructor;
-import lombok.AllArgsConstructor;
 import lombok.ToString;
 
 import java.util.ArrayList;
@@ -20,7 +20,7 @@ import java.util.List;
 @Getter
 @Setter
 @NoArgsConstructor
-@AllArgsConstructor
+@SuperBuilder
 @EqualsAndHashCode(callSuper = true, of = {})
 @ToString(callSuper = true)
 public class Paciente extends BaseEntidad {
@@ -33,6 +33,10 @@ public class Paciente extends BaseEntidad {
 
     @Column(name = "email", nullable = false, unique = true, length = 150)
     private String email; // Correo electrónico del paciente
+
+    @ToString.Exclude // Nunca incluir la contraseña en logs
+    @Column(name = "contrasena", nullable = false)
+    private String contrasena; // Contraseña codificada del paciente
 
     @Column(name = "telefono", length = 20)
     private String telefono; // Número de teléfono del paciente

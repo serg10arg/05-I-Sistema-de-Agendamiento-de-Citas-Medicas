@@ -5,7 +5,10 @@ import jakarta.persistence.EntityListeners;
 import jakarta.persistence.Id;
 import jakarta.persistence.PrePersist;
 import jakarta.persistence.MappedSuperclass;
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.Getter;
+import lombok.experimental.SuperBuilder;
 import lombok.Setter;
 import org.springframework.data.annotation.CreatedDate;
 import org.springframework.data.annotation.LastModifiedDate;
@@ -23,6 +26,8 @@ import java.util.UUID; // UUID para identificadores
 @Getter
 @Setter
 @MappedSuperclass // No es una entidad por sí misma, sino una superclase mapeada
+@NoArgsConstructor(access = AccessLevel.PROTECTED)
+@SuperBuilder // Habilita el patrón builder para jerarquías de herencia
 @EntityListeners(AuditingEntityListener.class) // Habilita la auditoría automática
 public abstract class BaseEntidad {
 

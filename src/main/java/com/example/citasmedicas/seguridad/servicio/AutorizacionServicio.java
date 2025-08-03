@@ -2,6 +2,7 @@ package com.example.citasmedicas.seguridad.servicio;
 
 import com.example.citasmedicas.repositorio.CitaRepositorio;
 import com.example.citasmedicas.repositorio.DisponibilidadRepositorio;
+import com.example.citasmedicas.repositorio.DoctorRepositorio;
 import org.springframework.security.core.Authentication;
 import org.springframework.stereotype.Service;
 
@@ -16,10 +17,12 @@ public class AutorizacionServicio {
 
     private final CitaRepositorio citaRepositorio;
     private final DisponibilidadRepositorio disponibilidadRepositorio;
+    private final DoctorRepositorio doctorRepositorio;
 
-    public AutorizacionServicio(CitaRepositorio citaRepositorio, DisponibilidadRepositorio disponibilidadRepositorio) {
+    public AutorizacionServicio(CitaRepositorio citaRepositorio, DisponibilidadRepositorio disponibilidadRepositorio, DoctorRepositorio doctorRepositorio) {
         this.citaRepositorio = citaRepositorio;
         this.disponibilidadRepositorio = disponibilidadRepositorio;
+        this.doctorRepositorio = doctorRepositorio;
     }
 
     /**
@@ -44,8 +47,18 @@ public class AutorizacionServicio {
                 .orElse(false);
     }
 
-    // Podrías añadir más métodos como esPropietarioDePaciente, esPropietarioDeDoctor, etc.
-    public boolean esPropietario(Authentication authentication, String username) {
-        return authentication.getName().equals(username);
+    /**
+     * Comprueba si el usuario autenticado es el doctor correspondiente a un ID.
+     * @param authentication El objeto de autenticación actual.
+     * @param doctorId El UUID del doctor a comprobar.
+     * @return true si el email del usuario autenticado coincide con el email del doctor.
+     */
+    public boolean esPropietarioDeDoctor(Authentication authentication, UUID doctorId) {
+        return doctorRepositorio.findById(doctorId)
+                .map(doctor -> doctor.getEmail().equals(authentication.getName()))
+                .orElse(false); // Si el doctor no existe, denegar acceso
     }
+
+    // Este método es demasiado genérico y propenso a errores, se podría eliminar
+    // public boolean esPropietario(Authentication authentication, String username) { ... }
 }
